@@ -1,0 +1,52 @@
+[
+  {
+    "id": "healthcare/npi_number",
+    "sector": "healthcare",
+    "pattern": "\\bNPI[:\\s#]*([1-9]\\d{9})\\b",
+    "severity": "high",
+    "context": {
+      "boost": ["npi", "provider", "physician", "practitioner", "clinic"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "healthcare/icd10_code",
+    "sector": "healthcare",
+    "pattern": "\\b[A-TV-Z][0-9][0-9A-Z](?:\\.[0-9A-Z]{1,4})?\\b",
+    "severity": "medium",
+    "context": {
+      "boost": ["icd", "diagnosis", "code", "condition", "disease"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "healthcare/insurance_member_id",
+    "sector": "healthcare",
+    "pattern": "\\b(?:member|subscriber|insured)[\\s\\-#:]*([A-Z0-9]{6,15})\\b",
+    "severity": "high",
+    "context": {
+      "boost": ["insurance", "member", "subscriber", "plan", "policy"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "healthcare/medical_record_number",
+    "sector": "healthcare",
+    "pattern": "\\b(?:MRN|medical record)[:\\s#]*([A-Z0-9]{5,12})\\b",
+    "severity": "critical",
+    "context": {
+      "boost": ["mrn", "medical record", "patient", "hospital", "chart"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "healthcare/dea_number",
+    "sector": "healthcare",
+    "pattern": "\\b[A-Z]{2}[0-9]{7}\\b",
+    "severity": "critical",
+    "context": {
+      "boost": ["dea", "drug", "prescribe", "controlled", "substance"],
+      "suppress": ["example", "test", "sample"]
+    }
+  }
+]

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "technology/aws_access_key",
+    "sector": "technology",
+    "pattern": "(?:A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}",
+    "severity": "critical",
+    "context": {
+      "boost": ["aws", "amazon", "access", "key", "iam"],
+      "suppress": ["example", "test", "sample", "fake"]
+    }
+  },
+  {
+    "id": "technology/openai_key",
+    "sector": "technology",
+    "pattern": "sk-[A-Za-z0-9]{20,}T3BlbkFJ[A-Za-z0-9]{20,}",
+    "severity": "critical",
+    "context": {
+      "boost": ["openai", "gpt", "api", "key", "secret"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "technology/anthropic_key",
+    "sector": "technology",
+    "pattern": "sk-ant-[A-Za-z0-9\\-_]{40,}",
+    "severity": "critical",
+    "context": {
+      "boost": ["anthropic", "claude", "api", "key", "secret"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "technology/github_token",
+    "sector": "technology",
+    "pattern": "gh[pousr]_[A-Za-z0-9]{36,}",
+    "severity": "critical",
+    "context": {
+      "boost": ["github", "token", "git", "repo", "personal access"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "technology/stripe_key",
+    "sector": "technology",
+    "pattern": "(?:sk|pk)_(?:live|test)_[A-Za-z0-9]{24,}",
+    "severity": "critical",
+    "context": {
+      "boost": ["stripe", "payment", "api", "key", "secret"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "technology/jwt_token",
+    "sector": "technology",
+    "pattern": "eyJ[A-Za-z0-9_\\-]+\\.eyJ[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+",
+    "severity": "high",
+    "context": {
+      "boost": ["jwt", "token", "bearer", "auth", "authorization"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "technology/private_key",
+    "sector": "technology",
+    "pattern": "-----BEGIN (?:RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",
+    "severity": "critical",
+    "context": {
+      "boost": ["private", "key", "pem", "cert", "rsa", "ssh"],
+      "suppress": ["example", "test", "sample"]
+    }
+  },
+  {
+    "id": "technology/connection_string",
+    "sector": "technology",
+    "pattern": "(?:mongodb|postgresql|mysql|redis|amqp)(?:\\+srv)?://[^:]+:[^@]+@[^/\\s]+",
+    "severity": "critical",
+    "context": {
+      "boost": ["database", "db", "connection", "uri", "dsn"],
+      "suppress": ["example", "test", "localhost", "sample"]
+    }
+  }
+]
