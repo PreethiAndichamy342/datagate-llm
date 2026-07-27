@@ -2,6 +2,8 @@
 Rule loader with in-process cache. stdlib only.
 """
 
+from __future__ import annotations
+
 import json
 import os
 import re

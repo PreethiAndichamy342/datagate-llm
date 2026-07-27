@@ -23,6 +23,8 @@ Returns a dict with keys:
     trace (list[str])    - human-readable decision log
 """
 
+from __future__ import annotations
+
 import os
 
 from .engine import tokenize, match, score, resolve, aggregate, build_result
