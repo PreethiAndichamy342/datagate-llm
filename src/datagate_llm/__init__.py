@@ -26,20 +26,26 @@ Returns a dict with keys:
 import os
 
 from .engine import tokenize, match, score, resolve, aggregate, build_result
-from .loader import load_rules
+from .loader import load_rules, add_rule, clear_rules
 
 __version__ = "0.1.0"
-__all__ = ["scan"]
+__all__ = ["scan", "add_rule", "clear_rules"]
 
 _RULES_DIR = os.path.join(os.path.dirname(__file__), "rules")
 
 
-def scan(text, sectors=None, mode="flag", rules_dir=_RULES_DIR):
+def scan(
+    text: str,
+    sectors: list | None = None,
+    mode: str = "flag",
+    rules_dir: str = _RULES_DIR,
+    custom_rules: str | None = None,
+) -> dict:
     """Run the full detection pipeline on *text*."""
     sectors = sectors or []
     trace = []
 
-    rules = load_rules(sectors, rules_dir)
+    rules = load_rules(sectors, rules_dir, custom_rules)
     trace.append(f"loaded {len(rules)} rules for sectors={['universal'] + sectors}")
 
     cleaned = tokenize(text)

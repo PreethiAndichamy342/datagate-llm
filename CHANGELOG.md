@@ -5,6 +5,14 @@ All notable changes to datagate-llm are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- add_rule() — register custom patterns at runtime
+- clear_rules() — clear runtime rules and cache
+- custom_rules param in scan() for file-based rules
+- Runtime rules always loaded last
+- Validation on severity, regex, duplicate id
+
 ## [0.1.0] - 2026-06-04
 
 ### Added
