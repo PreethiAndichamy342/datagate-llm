@@ -27,11 +27,15 @@ from __future__ import annotations
 
 import os
 
-from .engine import tokenize, match, score, resolve, aggregate, build_result
+from .engine import (
+    tokenize, match, score,
+    resolve, aggregate, build_result,
+    detect_hardcoded,
+)
 from .loader import load_rules, add_rule, clear_rules
 
 __version__ = "0.1.0"
-__all__ = ["scan", "add_rule", "clear_rules"]
+__all__ = ["scan", "add_rule", "clear_rules", "detect_hardcoded"]
 
 _RULES_DIR = os.path.join(os.path.dirname(__file__), "rules")
 
@@ -42,6 +46,7 @@ def scan(
     mode: str = "flag",
     rules_dir: str = _RULES_DIR,
     custom_rules: str | None = None,
+    scan_hardcoded: bool = True,
 ) -> dict:
     """Run the full detection pipeline on *text*."""
     sectors = sectors or []
@@ -53,10 +58,12 @@ def scan(
     cleaned = tokenize(text)
     trace.append("tokenized input")
 
-    spans = match(cleaned, rules)
-    trace.append(f"matched {len(spans)} raw spans")
+    rule_spans = match(cleaned, rules)
+    if scan_hardcoded:
+        rule_spans = rule_spans + detect_hardcoded(cleaned)
+    trace.append(f"matched {len(rule_spans)} raw spans")
 
-    scored = [dict(span, confidence=score(span, cleaned)) for span in spans]
+    scored = [{**s, "confidence": score(s, cleaned)} for s in rule_spans]
     clean_spans = resolve(scored)
     trace.append(f"resolved to {len(clean_spans)} non-overlapping spans")
 

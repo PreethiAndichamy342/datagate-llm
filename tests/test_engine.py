@@ -82,3 +82,64 @@ def test_fingerprint_is_deterministic():
     r2 = build_result("hello", [], 0.0, "flag", "v1")
     assert r1["fingerprint"] == r2["fingerprint"]
     assert len(r1["fingerprint"]) == 16
+
+
+from datagate_llm.engine import _entropy, _token_anomaly, detect_hardcoded
+
+
+def test_entropy_empty():
+    assert _entropy("") == 0.0
+
+
+def test_entropy_high_random():
+    assert _entropy("xK9#mP2$vL8nQ5rT!") > 4.0
+
+
+def test_entropy_low_natural():
+    assert _entropy("hello world") < 4.0
+
+
+def test_token_anomaly_camelcase():
+    assert _token_anomaly("mySecretPassword") > 0.3
+
+
+def test_token_anomaly_key_value():
+    assert _token_anomaly("DATABASE_URL=postgres") > 0.5
+
+
+def test_token_anomaly_clean():
+    assert _token_anomaly("hello") < 0.3
+
+
+def test_detect_uuid():
+    r = detect_hardcoded(
+        "session 3f2a9c1b-4d5e-4f6a-8b9c-1d2e3f4a5b6c"
+    )
+    assert len(r) > 0
+    assert r[0]["rule_id"] == "hardcoded/detected"
+
+
+def test_detect_prefix_num():
+    r = detect_hardcoded("user EMP-123456 logged in")
+    assert len(r) > 0
+
+
+def test_detect_key_value():
+    r = detect_hardcoded(
+        "DATABASE_URL=postgres://user:pass@host/db"
+    )
+    assert len(r) > 0
+
+
+def test_detect_clean_sentence():
+    r = detect_hardcoded(
+        "the quick brown fox jumps over the lazy dog"
+    )
+    assert r == []
+
+
+def test_detect_long_hex():
+    r = detect_hardcoded(
+        "hash 8f14e45fceea167a5a36dedd4bea2543"
+    )
+    assert len(r) > 0

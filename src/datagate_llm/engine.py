@@ -2,9 +2,13 @@
 Pure-function detection engine. No side effects. No I/O. stdlib only.
 """
 
+from __future__ import annotations
+
 import hashlib
+import math
 import re
 import unicodedata
+from collections import Counter
 from math import log1p
 
 _ZERO_WIDTH = re.compile(r"[\u200b-\u200f\u202a-\u202e\ufeff\u00ad]")
@@ -125,3 +129,76 @@ def _resolve_action(risk, mode):
     if mode == "flag":
         return "flag"
     return "allow"
+
+
+def _entropy(text: str) -> float:
+    """Shannon entropy. High = suspicious."""
+    if not text:
+        return 0.0
+    freq = Counter(text)
+    length = len(text)
+    return -sum(
+        (c / length) * math.log2(c / length)
+        for c in freq.values()
+    )
+
+
+def _token_anomaly(token: str) -> float:
+    """Score token for anomaly signals. Returns 0.0 to 1.0."""
+    signals = 0
+    sym = sum(1 for c in token if not c.isalnum()) / max(len(token), 1)
+    if sym > 0.3:
+        signals += 1
+    if re.search(r'[a-z][A-Z]', token):
+        signals += 1
+    if re.search(r'[a-zA-Z]_[a-zA-Z]', token):
+        signals += 1
+    if len(token) >= 12:
+        signals += 1
+    if re.search(r'[A-Z_]{3,}=\S{4,}', token):
+        signals += 1
+    return signals / 5
+
+
+_STRUCTURAL = [
+    re.compile(
+        r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}'
+        r'-[0-9a-f]{4}-[0-9a-f]{12}', re.I
+    ),
+    re.compile(r'[A-Z]{2,6}-\d{3,10}'),
+    re.compile(r'[A-Z]{2,6}-[A-Z0-9]{4,16}'),
+    re.compile(r'\b[0-9a-f]{32,64}\b'),
+    re.compile(r'[A-Za-z0-9+/]{30,}={0,2}'),
+    re.compile(r'[A-Z_]{3,}=\S{6,}'),
+]
+
+
+def detect_hardcoded(text: str) -> list:
+    """Detect hardcoded values by shape, not rules."""
+    findings = []
+    offset = 0
+    for token in text.split():
+        start = text.index(token, offset)
+        end = start + len(token)
+        offset = end
+        if len(token) < 6:
+            continue
+        sigs = []
+        if _entropy(token) > 3.0:
+            sigs.append("entropy")
+        if _token_anomaly(token) > 0.5:
+            sigs.append("anomaly")
+        if any(p.search(token) for p in _STRUCTURAL):
+            sigs.append("structural")
+        if len(sigs) >= 2:
+            findings.append({
+                "start": start,
+                "end": end,
+                "text": token,
+                "rule_id": "hardcoded/detected",
+                "sector": "universal",
+                "severity": "high" if len(sigs) == 3 else "medium",
+                "confidence": min(len(sigs) * 0.35, 1.0),
+                "signals": sigs,
+            })
+    return findings

@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - custom_rules param in scan() for file-based rules
 - Runtime rules always loaded last
 - Validation on severity, regex, duplicate id
+- detect_hardcoded() using entropy, token anomaly, structural patterns
+- scan_hardcoded param in scan() (default True)
+- Catches UUIDs, PREFIX-NUM, hex, base64, key=value without any rules
 
 ## [0.1.0] - 2026-06-04
 

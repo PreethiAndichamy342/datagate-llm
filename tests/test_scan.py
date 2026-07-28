@@ -61,3 +61,26 @@ def test_finance_sector_detects_iban():
     text = "Wire to GB29NWBK60161331926819"
     r = scan(text, sectors=["finance"])
     assert any("iban" in f["rule_id"] for f in r["findings"])
+
+
+def test_scan_detects_uuid():
+    r = scan("session 3f2a9c1b-4d5e-4f6a-8b9c-1d2e3f4a5b6c")
+    assert r["safe"] == False
+
+
+def test_scan_detects_emp_id():
+    r = scan("employee EMP-123456 accessed system")
+    assert r["safe"] == False
+
+
+def test_scan_hardcoded_disabled():
+    r = scan(
+        "session 3f2a9c1b-4d5e-4f6a-8b9c-1d2e3f4a5b6c",
+        scan_hardcoded=False,
+    )
+    assert r["safe"] == True
+
+
+def test_scan_clean_stays_safe():
+    r = scan("how can I help you today", scan_hardcoded=True)
+    assert r["safe"] == True
