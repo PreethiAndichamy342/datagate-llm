@@ -35,7 +35,7 @@ from .engine import (
 from .loader import load_rules, add_rule, clear_rules
 from .builder import build_rule, add_pattern
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __all__ = [
     "scan", "add_rule", "clear_rules",
     "detect_hardcoded", "protect", "unprotect", "gate",

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "datagate-llm"
-version = "0.1.2"
+version = "0.1.3"
 description = "The inference boundary layer between your data and outbound AI requests"
 readme = "README.md"
 license = { text = "MIT" }
