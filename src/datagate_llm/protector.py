@@ -9,21 +9,13 @@ _PROTECTED: dict = {}  # tracks patched clients
 
 
 def protect(
-    client: object,
-    sectors: list | None = None,
-    mode: str = "flag",
-    custom_rules: str | None = None,
-    scan_hardcoded: bool = True,
-) -> None:
-    """
-    Wrap an LLM client to auto-scan every request.
-
-    Supports openai and anthropic clients.
-    Call once at app startup.
-
-    Raises:
-        ValueError: if client already protected or unsupported
-    """
+    client,
+    sectors=None,
+    mode="flag",
+    custom_rules=None,
+    scan_hardcoded=True,
+):
+    """Wrap openai/anthropic client to auto-scan every request."""
     name = _client_name(client)
     if name in _PROTECTED:
         raise ValueError(f"{name} already protected")
@@ -45,21 +37,15 @@ def protect(
     _PROTECTED[name] = original
 
 
-def unprotect(client: object) -> None:
-    """
-    Remove protection from a client.
-    Restores original method. Useful for testing.
-
-    Raises:
-        ValueError: if client not protected
-    """
+def unprotect(client) -> None:
+    """Remove protection and restore original method."""
     name = _client_name(client)
     if name not in _PROTECTED:
         raise ValueError(f"{name} is not protected")
     _set_method(client, name, _PROTECTED.pop(name))
 
 
-def _client_name(client: object) -> str:
+def _client_name(client) -> str:
     """Identify client by module or class name."""
     name = getattr(client, "__name__", None)
     if name:
@@ -67,8 +53,8 @@ def _client_name(client: object) -> str:
     return type(client).__module__.split(".")[0]
 
 
-def _get_method(client: object, name: str):
-    """Return the create method for known clients, else None."""
+def _get_method(client, name):
+    """Return create method for known clients, else None."""
     try:
         if name == "openai":
             return client.chat.completions.create
@@ -79,7 +65,7 @@ def _get_method(client: object, name: str):
     return None
 
 
-def _set_method(client: object, name: str, fn) -> None:
+def _set_method(client, name, fn) -> None:
     """Patch the create method on the client."""
     if name == "openai":
         client.chat.completions.create = fn
@@ -87,18 +73,8 @@ def _set_method(client: object, name: str, fn) -> None:
         client.messages.create = fn
 
 
-def _scan_messages(
-    kwargs: dict,
-    sectors: list | None,
-    mode: str,
-    custom_rules: str | None,
-    scan_hardcoded: bool,
-) -> None:
-    """
-    Scan all message content before sending.
-    Mutates kwargs in place for redact mode.
-    Raises ValueError in block mode if unsafe.
-    """
+def _scan_messages(kwargs, sectors, mode, custom_rules, scan_hardcoded):
+    """Scan messages; mutate for redact; raise for block."""
     from datagate_llm import scan
 
     messages = kwargs.get("messages", [])

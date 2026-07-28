@@ -33,10 +33,14 @@ from .engine import (
     detect_hardcoded,
 )
 from .loader import load_rules, add_rule, clear_rules
+from .builder import build_rule, add_pattern
 
 __version__ = "0.1.0"
-__all__ = ["scan", "add_rule", "clear_rules", "detect_hardcoded",
-           "protect", "unprotect"]
+__all__ = [
+    "scan", "add_rule", "clear_rules",
+    "detect_hardcoded", "protect", "unprotect", "gate",
+    "build_rule", "add_pattern",
+]
 
 _RULES_DIR = os.path.join(os.path.dirname(__file__), "rules")
 
@@ -78,3 +82,4 @@ def scan(
 
 
 from .protector import protect, unprotect  # noqa: E402
+from .gate import gate  # noqa: E402

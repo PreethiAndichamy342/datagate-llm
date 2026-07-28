@@ -202,3 +202,30 @@ def detect_hardcoded(text: str) -> list:
                 "signals": sigs,
             })
     return findings
+
+
+def _first_string(args: tuple, kwargs: dict):
+    """Return first string found in args or kwargs."""
+    for a in args:
+        if isinstance(a, str):
+            return a
+    for v in kwargs.values():
+        if isinstance(v, str):
+            return v
+    return None
+
+
+def _replace_first_string(
+    args: tuple, kwargs: dict, replacement: str,
+) -> tuple:
+    """Replace first string in args or kwargs."""
+    args = list(args)
+    for i, a in enumerate(args):
+        if isinstance(a, str):
+            args[i] = replacement
+            return tuple(args), kwargs
+    for k, v in kwargs.items():
+        if isinstance(v, str):
+            kwargs[k] = replacement
+            return tuple(args), kwargs
+    return tuple(args), kwargs

@@ -99,3 +99,58 @@ def test_protect_clean_reaches_original():
         messages=[{"role": "user", "content": "how do I sort a list"}]
     )
     assert result == {"choices": []}
+
+
+from datagate_llm import gate
+
+
+def test_gate_flag_clean_passes():
+    @gate(mode="flag")
+    def ask(prompt):
+        return f"ok:{prompt}"
+    assert ask("hello world") == "ok:hello world"
+
+
+def test_gate_block_raises_on_unsafe():
+    @gate(mode="block", sectors=["technology"])
+    def ask(prompt):
+        return "response"
+    with pytest.raises(ValueError, match="blocked"):
+        ask("key AKIAIOSFODNN7EXAMPLE")
+
+
+def test_gate_redact_cleans_input():
+    @gate(mode="redact")
+    def ask(prompt):
+        return prompt
+    result = ask("email me at john@company.com")
+    assert "john@company.com" not in result
+
+
+def test_gate_block_clean_passes():
+    @gate(mode="block")
+    def ask(prompt):
+        return "safe response"
+    assert ask("how do I sort a list") == "safe response"
+
+
+def test_gate_preserves_function_name():
+    @gate(mode="flag")
+    def my_function(prompt):
+        return prompt
+    assert my_function.__name__ == "my_function"
+
+
+def test_gate_kwargs_supported():
+    @gate(mode="block", sectors=["technology"])
+    def ask(prompt):
+        return prompt
+    with pytest.raises(ValueError, match="blocked"):
+        ask(prompt="key AKIAIOSFODNN7EXAMPLE")
+
+
+def test_gate_no_string_arg_passes_through():
+    @gate(mode="block")
+    def process(data):
+        return data
+    assert process(42) == 42

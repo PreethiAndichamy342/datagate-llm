@@ -96,6 +96,51 @@ for finding in result["findings"]:
 
 ---
 
+## Custom Pattern Templates
+
+No regex knowledge needed. Use built-in templates
+to describe your organisation's sensitive identifiers.
+
+```python
+from datagate_llm import add_pattern
+
+add_pattern(
+    name="patient_id",
+    template="prefix_digits",
+    prefix="PT",
+    n=8,
+    severity="high"
+)
+```
+
+Available templates:
+
+| Template | Example Match | Description |
+|----------|--------------|-------------|
+| `prefix_digits` | `PT12345678` | Fixed prefix + N digits |
+| `prefix_dash_digits` | `ORD-123456` | Fixed prefix + dash + N digits |
+| `prefix_dash_alphanum` | `INT-AB1234` | Fixed prefix + dash + N alphanumeric |
+| `digits_only` | `123456789` | N digits, no prefix |
+| `alphanum_fixed` | `ABC123DEF` | N alphanumeric characters |
+| `key_value` | `MYKEY=value` | KEY=value pairs |
+
+For patterns not covered by templates, use `add_rule()`
+directly with a regex string:
+
+```python
+from datagate_llm import add_rule
+
+# Variable length, optional parts, OR conditions
+add_rule(
+    id="custom/complex_id",
+    pattern=r"PT-?\d{6,10}",
+    severity="high",
+    sector="custom"
+)
+```
+
+---
+
 ## How It Works
 
 ```

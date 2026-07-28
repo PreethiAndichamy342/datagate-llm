@@ -45,6 +45,56 @@ Pull requests that add any of the following will be closed without review:
 - **Hardcoded values** in Python files — all patterns belong in JSON.
 - **Files over 100 lines** or functions over 20 lines.
 
+## How to Add New Templates
+
+Templates live in `src/datagate_llm/builder.py`
+in the `_TEMPLATES` dict.
+
+Each template is a Python format string:
+
+```python
+_TEMPLATES = {
+    "your_template_name": r"{prefix}\d{{{n}}}",
+}
+```
+
+Format string variables available:
+- `{prefix}` — fixed string prefix
+- `{n}` — digit or character count
+
+### Rules for new templates:
+1. Name must be lowercase with underscores
+2. Must be expressible with `{prefix}` and `{n}` only
+3. Must have a test in `tests/test_builder.py`
+4. Must be added to the README.md template table
+5. Must be documented with an example match
+
+### What belongs in templates vs rules:
+
+| Use a template when… | Use `add_rule()` when… |
+|----------------------|------------------------|
+| Pattern is `PREFIX + fixed-length digits/alphanum` | Length is variable (`\d{6,10}`) |
+| Format never changes between organisations | Pattern has optional parts (`-?`) |
+| No regex knowledge is available | Pattern requires OR conditions (`A|B`) |
+| You want validation on prefix and length | You need character classes or lookaheads |
+
+If you are unsure, use `add_rule()` — it accepts any valid Python regex.
+
+### Example PR for new template:
+```python
+# 1. Add to _TEMPLATES in builder.py
+"prefix_slash_digits": r"{prefix}/\d{{{n}}}",
+
+# 2. Add test in test_builder.py
+def test_prefix_slash_digits():
+    r = build_rule("x", "prefix_slash_digits",
+                   "high", prefix="INV", n=6)
+    assert r["pattern"] == r"INV/\d{6}"
+
+# 3. Add to README.md table
+# | `prefix_slash_digits` | `INV/123456` | ... |
+```
+
 ## How to Run Tests Locally
 
 ```bash
