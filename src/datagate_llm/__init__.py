@@ -35,7 +35,8 @@ from .engine import (
 from .loader import load_rules, add_rule, clear_rules
 
 __version__ = "0.1.0"
-__all__ = ["scan", "add_rule", "clear_rules", "detect_hardcoded"]
+__all__ = ["scan", "add_rule", "clear_rules", "detect_hardcoded",
+           "protect", "unprotect"]
 
 _RULES_DIR = os.path.join(os.path.dirname(__file__), "rules")
 
@@ -74,3 +75,6 @@ def scan(
     result = build_result(cleaned, clean_spans, risk, mode, rule_version)
     result["trace"] = trace
     return result
+
+
+from .protector import protect, unprotect  # noqa: E402

@@ -15,6 +15,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - detect_hardcoded() using entropy, token anomaly, structural patterns
 - scan_hardcoded param in scan() (default True)
 - Catches UUIDs, PREFIX-NUM, hex, base64, key=value without any rules
+- protect() — auto-scan all LLM client calls
+- unprotect() — restore original client method
+- Supports openai and anthropic clients
+- flag/redact/block modes per protect() call
+- One line at startup protects entire codebase
 
 ## [0.1.0] - 2026-06-04
 
